@@ -4,34 +4,54 @@ import java.util.ArrayList;
 
 public class CardDeck {
 	ArrayList<Card> theCardDeck;
+	private ArrayList<Card> dealList;
+	private int topCardIndex;
 	public CardDeck() {
+		topCardIndex = -1;
 		theCardDeck = new ArrayList<Card>();
 		String[] suites = {"S", "H", "D", "C"};
 		for (String suit : suites) {
 			for (int i = 1; i <= 13; i++) {
-				System.out.println("CD: "+suit+" "+i);
 				theCardDeck.add(new Card(suit,i));
+				topCardIndex++;
 			}
 		}
 	}
 	public int getCardCount() {
-		return theCardDeck.size();
+		//if(dealList != null) return theCardDeck.size() + dealList.size();
+		return topCardIndex + 1;
 	}
 	public Card getCard(int index) {
-		if(index > 0 && index <= 52 && index < getCardCount() && getCard(index) != null){
-			return getCard(index); 
+		if(index >= 0 && index < 52){
+			return theCardDeck.get(index); 
 		}
 		return null;
 	}
 	public ArrayList<Card> deal(int remove) {
-		ArrayList<Card> dealList = new ArrayList<Card>();
-		if(getCardCount() > remove){
-			for (int i = 1; i <= remove; i++) {
-				int cardnr = theCardDeck.size() - 1;
-				dealList.add(theCardDeck.get(cardnr));
-				theCardDeck.remove(cardnr);
-			}
-		} else { return null; }
-		return dealList;
+		 dealList = new ArrayList<Card>();
+		 if(topCardIndex + 1 >= remove) {
+//			while(getCardCount() > remove){
+				for (int i = 0; i < remove; i++) {
+					dealList.add(getCard(topCardIndex));
+					topCardIndex--;
+				}
+//			}
+				System.out.println(topCardIndex);
+				//printCardDeck(dealList);
+				return dealList;
+		 }
+		 return null;
+	}
+	public void printCardDeck(ArrayList<Card> deal){
+		System.out.println("Deallist:");
+		for (Card card : deal) {
+			System.out.println(card.toString());
+		}
+		System.out.println();
+		System.out.println("CardDeck("+getCardCount()+"):");
+		for (Card card : theCardDeck) {
+			System.out.println(card.toString());
+		}
+		System.out.println();
 	}
 }

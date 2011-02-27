@@ -31,16 +31,23 @@ public class Person {
 	}
 	public void setMother(Person newMother) {
 		if(newMother != null){
-			if(newMother.isFemale()){ mother = newMother; }
-		}
+			if(newMother.isFemale()){ 
+				if(mother != null){ mother.removeChild(this);}
+				mother = newMother;mother.addChild(this); 
+			}
+		} else if(mother != null){ Person tmp = mother; mother = null; tmp.removeChild(this); }
 	}
 	public Person getFather() {
 		return father;
 	}
 	public void setFather(Person newFather) {
 		if(newFather != null){ 
-			if(newFather.isMale()){ father = newFather; } 
-		}
+			if(newFather.isMale()){ 
+				if(father != null){ father.removeChild(this); }
+				father = newFather; father.addChild(this); 
+			
+			} 
+		} else if(father != null){ Person tmp = father; father = null; tmp.removeChild(this); }
 	}
 	public void addChild(Person newChild) {
 		if(!(containsChild(newChild))){
@@ -48,26 +55,25 @@ public class Person {
 				if(newChild.getMother() != null){ newChild.getMother().removeChild(newChild); } 
 				children.add(newChild);
 				newChild.setMother(this); 
-			} else if(this.isMale()){ 
+			} else if(this.isMale()){  
 				if(newChild.getFather() != null){ newChild.getFather().removeChild(newChild); }
 				children.add(newChild);
 				newChild.setFather(this); 
 			} else{ System.out.println("No gender"); }
 //			System.out.println("Child "+this.getChildCount() + ":  " + newChild);
-		}
+		} else{ System.out.println("Can't add a kid that has already been added"); }
 	}
 	public void removeChild(Person child){
 		try{
-			if(child.getFather() == this){ child.setFather(null); }
-			else if(child.getMother() == this){ child.setMother(null); }
-			children.remove(child);
-//			System.out.println("RMkid: " + child);
+			if(child.getFather() == this){ child.setFather(null);System.out.println(child.getFather()); children.remove(child);}
+			else if(child.getMother() == this){ child.setMother(null); System.out.println(child.getMother());children.remove(child);}
+			else {children.remove(child);}
 			} catch(IndexOutOfBoundsException e){ System.out.println(e); }
 	}
 	public Person getChild(int index) {
 		try{
-		Person child = children.get(index);
-		return child;
+			Person child = children.get(index);
+			return child;
 		} catch(IndexOutOfBoundsException e){ System.out.println("Out of bound[children]:add child"); return null; }
 	}
 	public int indexOfChild(Person child) {
@@ -77,6 +83,9 @@ public class Person {
 		return (children.contains(child));
 	}
 	public boolean isAncestorOf(Person child) {
-		return (child.getFather() == this || child.getMother() == this || this.containsChild(child.getFather()) || this.containsChild(child.getMother()));
+		if(child.getFather() == this || child.getMother() == this) return true;
+		if(child.getFather() != null && isAncestorOf(child.getFather())) return true;
+		if(child.getMother() != null && isAncestorOf(child.getMother())) return true;
+		return false;
 	}
 }
