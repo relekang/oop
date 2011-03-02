@@ -16,11 +16,8 @@ public class SokobanGameEngine {
 	private boolean lvlLoaded;
 	private int xPosition, yPosition, moves;
 	public char[][] getLvl(){
-		if(lvlLoaded){
-			return lvlArray;
-		} else {
-			return null;//TODO
-		}
+		if(lvlLoaded) return lvlArray;
+		else return null;
 	}
 	private class Movement {
 		void move(int dx, int dy){
@@ -107,7 +104,7 @@ public class SokobanGameEngine {
 					if(symbol == '*' || symbol == '.' || symbol == '+'){ targets[xPos][yPos] = true; } else { targets[xPos][yPos] = false;}
 				}
 			}
-			if(xPos < 9){ xPos++; } else { xPos = 0; }
+			if(xPos < x){ xPos++; } else { xPos = 0; }
 			if(symbol == '|'){ yPos++; xPos = 0; }
 		}
 		lvlLoaded = true;

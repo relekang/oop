@@ -23,36 +23,36 @@ public class Card implements Comparable<Card> {
 		return getSuit()+""+getFace();
 	}
 	public int compareTo(Card card) {
-		if(this.face == card.face && this.suit == card.suit) return 0;
-		else {
-			int faceDiff = getFaceValue() - card.getFaceValue();
-			int suitDiff = 0;
-/*			
+		int diff = 0;
+		if(this.getFace() == card.getFaceValue() && this.getSuit() == card.getSuit()) return 0;
+		else if(this.getFaceValue() == card.getFaceValue()){
 			switch (suitToChar()) {
 			case 'S':
-				if(card.getSuit() == "H") suitDiff = 13;
-				else if(card.getSuit() == "D") suitDiff = 2*13;
-				else if(card.getSuit() == "C") suitDiff = 3*13;
+				if(card.getSuit() == "H") diff = 1;
+				else if(card.getSuit() == "D") diff = 1;
+				else if(card.getSuit() == "C") diff = 1;
 				break;
 			case 'H':
-				if(card.getSuit() == "S") suitDiff = -13;
-				else if(card.getSuit() == "D") suitDiff = 13;
-				else if(card.getSuit() == "C") suitDiff = 3*13;
+				if(card.getSuit() == "S") diff = -1;
+				else if(card.getSuit() == "D") diff = 1;
+				else if(card.getSuit() == "C") diff = 1;
 				break;
 			case 'd':
-				if(card.getSuit() == "S") suitDiff = -2*13;
-				else if(card.getSuit() == "H") suitDiff = -13;
-				else if(card.getSuit() == "C") suitDiff = 13;
+				if(card.getSuit() == "S") diff = -1;
+				else if(card.getSuit() == "H") diff = -1;
+				else if(card.getSuit() == "C") diff = 1;
 				break;
 			case 'C':
-				if(card.getSuit() == "S") suitDiff = -3*13;
- 				else if(card.getSuit() == "H") suitDiff = -2*13;
-				else if(card.getSuit() == "D") suitDiff = -13;
+				if(card.getSuit() == "S") diff = -1;
+ 				else if(card.getSuit() == "H") diff = -1;
+				else if(card.getSuit() == "D") diff = -1;
 				break;
 			}
-*/
-			return faceDiff + suitDiff;
+		} else {
+				diff = this.getFaceValue() - card.getFaceValue();
 		}
+		System.out.println(this.toString() + card.toString() + ":"+diff);
+		return diff;
 	}
 	private boolean isSuit(String suit){
 		return (suit == "S" || suit == "H" || suit == "D" || suit == "C");

@@ -1,4 +1,4 @@
-package sokoban1;
+package sokoban2;
 
 import java.awt.GridBagConstraints;
 import java.awt.event.KeyEvent;
@@ -40,9 +40,9 @@ public class GraphicsSokoban extends GraphicsProgram {
 		this.addKeyListener(listener);
 	}
 	public void run() {
-//		String lvl = "#######|#  #.  #|# $#   #|#  # @##|#  # $##|#    .##|########";
-//		gameEngine.loadLevel(lvl, 8, 8);
-		gameEngine.loadLevelFromFile("/Sokoban/lvl01.txt");
+		String lvl = "#######|#  #.  #|# $#   #|#  # @##|#  # $##|#    .##|########";
+		gameEngine.loadLevel(lvl, 8, 8);
+//		gameEngine.loadLevelFromFile("/Sokoban/lvl00.txt");
 		gamePanel = new JPanel();
 		add(gamePanel, SOUTH);
 		
@@ -57,14 +57,15 @@ public class GraphicsSokoban extends GraphicsProgram {
 		@Override
 		public void keyReleased(KeyEvent e) {
 			if(!gameEngine.hasWon()){
-				if(e.getKeyCode() == 37){gameEngine.move(-1,0);} 
-				else if(e.getKeyCode() == 38){gameEngine.move(0,-1);}
-				else if(e.getKeyCode() == 39){gameEngine.move(1,0);}
-				else if(e.getKeyCode() == 40){gameEngine.move(0,1);}
+				if(e.getKeyCode() == 37){gameEngine.move(-1,0);gameEngine.addToMovesString("l");} 
+				else if(e.getKeyCode() == 38){gameEngine.move(0,-1);gameEngine.addToMovesString("u");}
+				else if(e.getKeyCode() == 39){gameEngine.move(1,0);gameEngine.addToMovesString("r");}
+				else if(e.getKeyCode() == 40){gameEngine.move(0,1);gameEngine.addToMovesString("d");}
 				updateBoard(theLvl);
 				updateStatus();
 				gameEngine.findTheGuy();
 				hasWon();
+				System.out.println(e.getKeyCode());
 			}
 		}
 		@Override
@@ -138,7 +139,7 @@ public class GraphicsSokoban extends GraphicsProgram {
 		
 	}
 	private void hasWon() {
-		if(gameEngine.hasWon()){ JOptionPane.showMessageDialog(this, "You made it with " + gameEngine.getMoves() +" moves", "Congratulation", JOptionPane.INFORMATION_MESSAGE);	}	
+		if(gameEngine.hasWon()){ JOptionPane.showMessageDialog(this, "You made it with " + gameEngine.getMoves() +" moves\n Moves: "+gameEngine.getMovesString(), "Congratulation", JOptionPane.INFORMATION_MESSAGE);	}	
 	}
 }
 
