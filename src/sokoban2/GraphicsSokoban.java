@@ -40,8 +40,7 @@ public class GraphicsSokoban extends GraphicsProgram {
 		this.addKeyListener(listener);
 	}
 	public void run() {
-		String lvl = "#######|#  #.  #|# $#   #|#  # @##|#  # $##|#    .##|########";
-		gameEngine.loadLevel(lvl, 8, 8);
+		
 //		gameEngine.loadLevelFromFile("/Sokoban/lvl00.txt");
 		gamePanel = new JPanel();
 		add(gamePanel, SOUTH);

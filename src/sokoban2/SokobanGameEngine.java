@@ -15,68 +15,16 @@ public class SokobanGameEngine {
 	public SokobanGameEngine() {
 		mover = new Movement();
 		importer = new LevelImporter();
+		String lvl = "#######|#  #.  #|# $#   #|#  # @##|#  # $##|#    .##|########";
+		lvlArray = importer.newLevel(lvl);//(lvl, 8, 8);
 	}
 	public char[][] getLvl(){
 		if(lvlLoaded) return lvlArray;
 		else return null;
 	}
-	public void loadLevel(String lvl, int x, int y){
-		System.out.println("Loading...");
-		int xPos = 0; int yPos = 0;
-		lvlArray = new char[x][y];
-		char[] symbols = lvl.toCharArray();
-		for(char symbol : symbols){//lvl.toCharArray()){
-			if(xPos < lvlArray[yPos].length && yPos < lvlArray.length ){
-//				System.out.println("Symbol: "+symbol+" ("+yPos+","+xPos+")");
-				if(symbol != '|') lvlArray[xPos][yPos] = symbol; 
-			}
-			if(xPos < x){ xPos++; } else { xPos = 0; }
-			if(symbol == '|'){ yPos++; xPos = 0; }
-		}
-		lvlLoaded = true;
-	}
 	
-	public class LevelImporter{
-		public void fromFile(String filepath){
-			File lvlFile = new File(filepath);
-			BufferedReader fileStream = null;
-			String level = "";
-			try {
-				fileStream = new BufferedReader(new FileReader(lvlFile));
-				String line = fileStream.readLine();
-			      while (line != null) {
-			        level = level + line;
-			        line = fileStream.readLine();
-			      }
-				fileStream.close();
-				System.out.println(level);
-				int x = getColumns(level);
-				int y = getRows(level);
-				loadLevel(level,x,y);
-				//loadLevel(level, getColumns(level), getRows(level));
-				
-			} catch (FileNotFoundException e) {
-				// TODO: handle exception
-			} catch (IOException e) {
-				// TODO: handle exception
-			}
-		}
-		private int getRows(String level) {
-			int nrOfLines = 1;
-			for(char symbol : level.toCharArray()){
-				if(symbol == '|') nrOfLines++;
-			}
-			return nrOfLines;
-		}
-		private int getColumns(String level) {
-			int count = 0;
-			for(char symbol : level.toCharArray()){
-				if(symbol == '|')return count;
-				count++;
-			}
-			return count;
-		}
-	}
+	
+	
 	private class Movement {
 		void move(int dx, int dy){
 			switch(getSymbol(xPos + dx, yPos + dy)){
@@ -109,24 +57,19 @@ public class SokobanGameEngine {
 			case '+': setSymbol('.', x, y); break;
 			}
 		}
+		public void makeLastMoveCaps() {
+			setMovesString(Character.toUpperCase(getMovesString().charAt(getMovesString().length()-1)),getMovesString().length()-1);
+		}
+		
+		
 	}
-	
 	public char[][] move(int dx, int dy){
 		mover.move(dx, dy);
 		return lvlArray;
 	}
 	
-	public void makeLastMoveCaps() {
-		setMovesString(Character.toUpperCase(getMovesString().charAt(getMovesString().length()-1)),getMovesString().length()-1);
-	}
-	public void setMovesString(char upperCase, int i) {
-		char[] chars = this.movesString.toCharArray();
-		chars[i] = upperCase;
-		String newString = "";
-		for (char c : chars) { newString += c; }
-		this.movesString = newString;
-		
-	}
+	
+	
 	public void findTheGuy() {
 		for(int i = 0; i < lvlArray.length; i++){
 			for (int ii = 0; ii < lvlArray[i].length; ii++) {
@@ -166,22 +109,28 @@ public class SokobanGameEngine {
 	public boolean hasWon(){
 		return (targetsLeft() == 0);
 	}
-	public int getMoves() {
-		return this.moves;
-	}
+	
 	public boolean isLevelLoaded(){
 		return lvlLoaded;
 	}
-
-	public void addToMovesString(String movesString) {
-		this.movesString += movesString;
+	public int getMoves() {
+		return this.moves;
 	}
-
 	public String getMovesString() {
 		return movesString;
 	}
-	public void loadLevelFromFile(String lvl) {
-		importer.fromFile(lvl);
+	public void setMovesString(char upperCase, int i) {
+		char[] chars = this.movesString.toCharArray();
+		chars[i] = upperCase;
+		String newString = "";
+		for (char c : chars) { newString += c; }
+		this.movesString = newString;
 		
+	}
+	public void addToMovesString(String movesString) {
+		movesString += movesString;
+	}
+	public void loadLevelFromFile(String lvl) {
+		lvlArray = importer.newLevel(lvl, true);	
 	}
 }

@@ -23,9 +23,10 @@ public class Card implements Comparable<Card> {
 		return getSuit()+""+getFace();
 	}
 	public int compareTo(Card card) {
-		int diff = 0;
-		if(this.getFace() == card.getFaceValue() && this.getSuit() == card.getSuit()) return 0;
+		int diff = 2000;
+		if(this.getFaceValue() == card.getFaceValue() && this.getSuit() == card.getSuit()) return 0;
 		else if(this.getFaceValue() == card.getFaceValue()){
+			System.out.println(suitToChar()+"  "+card.getSuit());
 			switch (suitToChar()) {
 			case 'S':
 				if(card.getSuit() == "H") diff = 1;
@@ -37,7 +38,7 @@ public class Card implements Comparable<Card> {
 				else if(card.getSuit() == "D") diff = 1;
 				else if(card.getSuit() == "C") diff = 1;
 				break;
-			case 'd':
+			case 'D':
 				if(card.getSuit() == "S") diff = -1;
 				else if(card.getSuit() == "H") diff = -1;
 				else if(card.getSuit() == "C") diff = 1;
