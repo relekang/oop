@@ -1,144 +1,187 @@
 package sokoban2;
 
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import javax.swing.JComboBox;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import com.sun.codemodel.internal.JSwitch;
-
-import acm.graphics.GImage;
-
-import acm.program.GraphicsProgram;
-
-/*
- * @startuml
- * class GraphicsSokoban {
- * }
- * class GraphicsProgram {
- * }
- * GraphicsProgram <|-- GraphicsSokoban
- * @enduml
- */
-
-public class GraphicsSokoban extends GraphicsProgram {
-	SokobanGameEngine gameEngine;
+@SuppressWarnings("serial")
+public class GraphicsSokoban extends JPanel implements KeyListener, ActionListener{
+	GameEngine gameEngine;
 	GridBagConstraints gbc;
-	JPanel statusPanel, gamePanel,lvlPanel;
+	static JFrame frame;
+	JPanel statusPanel, gamePanel;
 	JLabel movesLbl, targetsLeftLbl;
-	JComboBox lvlComboBox;
-	char[][] theLvl;
-	public void init() {
-		gameEngine = new SokobanGameEngine();
+	JLabel[][] graphicBoard;
+	MovesHistoryView movesHistoryView;
+	JMenuBar menuBar;JMenu lvlMenu;JMenuItem[] lvlMenuItems;
+	Icon blankImg, wallImg, targetImg, moverImg, moverOnTargetImg, movableImg, movableOnTargetImg;
+	public static void main(String[] args) {
+		frame = new JFrame("Sokoban");
+		frame.add(new GraphicsSokoban());
+//		frame.setResizable(false);
+		frame.setVisible(true);
+		frame.pack();
+		
+	}
+	
+	public GraphicsSokoban() {
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		gbc = new GridBagConstraints();
-		makeStatusLbl();
-//		makeLvlPanel();
-		this.addKeyListener(listener);
-	}
-	public void run() {
-		
-//		gameEngine.loadLevelFromFile("/Sokoban/lvl00.txt");
+		setLayout(new GridBagLayout());
+		createStatusPanel();		
 		gamePanel = new JPanel();
-		add(gamePanel, SOUTH);
-		
-		gamePanel.setFocusable(true);
-		theLvl = gameEngine.getLvl();
-		updateBoard(theLvl);
-		gameEngine.findTheGuy();
-		updateStatus();
+		gamePanel.setLayout(new GridBagLayout());
+		gbc.gridx = 0; gbc.gridy = 1;
+		add(gamePanel,gbc);
+		gameEngine = new GameEngine();
+		movesHistoryView = new MovesHistoryView();
+		movesHistoryView.setVisible(true);
+		frame.addKeyListener(this);
+		createMenu();
+		blankImg = new ImageIcon("resources/sokoban/icons/blank16x16.png");
+		wallImg = new ImageIcon("resources/sokoban/icons/wall16x16.png");
+		moverImg = new ImageIcon("resources/sokoban/icons/mover16x16.png");
+		targetImg = new ImageIcon("resources/sokoban/icons/target16x16.png");
+		moverOnTargetImg = new ImageIcon("resources/sokoban/icons/mover_on_target16x16.png");
+		movableImg = new ImageIcon("resources/sokoban/icons/movable16x16.png");
+		movableOnTargetImg = new ImageIcon("resources/sokoban/icons/movable_on_target16x16.png");
+		updateBoard();
+		frame.pack();
 	}
-	public KeyListener listener = new KeyListener() {
-		
-		@Override
-		public void keyReleased(KeyEvent e) {
-			if(!gameEngine.hasWon()){
-				if(e.getKeyCode() == 37){gameEngine.move(-1,0);gameEngine.addToMovesString("l");} 
-				else if(e.getKeyCode() == 38){gameEngine.move(0,-1);gameEngine.addToMovesString("u");}
-				else if(e.getKeyCode() == 39){gameEngine.move(1,0);gameEngine.addToMovesString("r");}
-				else if(e.getKeyCode() == 40){gameEngine.move(0,1);gameEngine.addToMovesString("d");}
-				updateBoard(theLvl);
-				updateStatus();
-				gameEngine.findTheGuy();
-				hasWon();
-				System.out.println(e.getKeyCode());
-			}
+	private void createMenu() {
+		menuBar = new JMenuBar();
+		lvlMenu = new JMenu("Level");
+		menuBar.add(lvlMenu);
+		lvlMenuItems = new JMenuItem[5];
+		for (int i = 0; i < lvlMenuItems.length; i++) {
+			lvlMenuItems[i] = new JMenuItem("Level "+i);
+			lvlMenu.add(lvlMenuItems[i]);
+			lvlMenuItems[i].addActionListener(this);
 		}
-		@Override
-		public void keyTyped(KeyEvent e) { 	}
-		@Override
-		public void keyPressed(KeyEvent e) { }
-		
-		
-	};
-	private void updateBoard(char[][] level) {
-		for (int i = 0; i < level.length; i++) {
-			for (int ii = 0; ii < level[i].length; ii++) {
-				switch(level[ii][i]){
-				case ' ':
-					GImage theImage = new GImage("sokoban/icons/blank16x16.png");
-					add(theImage, ii*16, i*16);
-					break;
-				case '#':
-					GImage theImage1 = new GImage("sokoban/icons/wall16x16.png");
-					add(theImage1, ii*16, i*16);
-					break;
-				case '.':
-					GImage theImage2 = new GImage("sokoban/icons/target16x16.png");
-					add(theImage2, ii*16, i*16);
-					break;
-				case '@':
-					GImage theImage3 = new GImage("sokoban/icons/mover16x16.png");
-					add(theImage3, ii*16, i*16);
-					break;
-				case '+':
-					GImage theImage4 = new GImage("sokoban/icons/mover_on_target16x16.png");
-					add(theImage4, ii*16, i*16);
-					break;
-				case '$':
-					GImage theImage5 = new GImage("sokoban/icons/movable16x16.png");
-					add(theImage5, ii*16, i*16);
-					break;
-				case '*':
-					GImage theImage6 = new GImage("sokoban/icons/movable_on_target16x16.png");
-					add(theImage6, ii*16, i*16);
-					break;
-				}
-			}
-		}
-	}
-	private void updateStatus(){
-		int moves = 0; int targetsLeft = 0;
-		if(gameEngine.isLevelLoaded()){
-			moves = gameEngine.getMoves();
-			targetsLeft = gameEngine.targetsLeft();
-		}
-		movesLbl.setText("Moves: " + moves);
-		targetsLeftLbl.setText("Targets left: " + targetsLeft);
-	}
-	private void makeStatusLbl() {
-		statusPanel = new JPanel();
-		movesLbl = new JLabel("Moves: 0");
-		targetsLeftLbl = new JLabel("Targets left: 0");
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		statusPanel.add(movesLbl, gbc);
-		gbc.gridx = 1;
-		statusPanel.add(targetsLeftLbl, gbc);
-		this.add(statusPanel, NORTH);
-	}
-	private void makeLvlPanel() {
-		lvlPanel = new JPanel();
-		lvlComboBox = new JComboBox();
-		lvlPanel.add(lvlComboBox);
-		add(lvlPanel, SOUTH);
+		frame.setJMenuBar(menuBar);
 		
 	}
-	private void hasWon() {
-		if(gameEngine.hasWon()){ JOptionPane.showMessageDialog(this, "You made it with " + gameEngine.getMoves() +" moves\n Moves: "+gameEngine.getMovesString(), "Congratulation", JOptionPane.INFORMATION_MESSAGE);	}	
-	}
-}
 
+	private void createStatusPanel() {
+		statusPanel = new JPanel();
+		statusPanel.setLayout(new GridBagLayout());
+		movesLbl = new JLabel("Moves: 000");
+		targetsLeftLbl = new JLabel("Targets left: 000");
+		gbc.gridx = 0; gbc.gridy = 0;
+		statusPanel.add(movesLbl,gbc);
+		gbc.gridx = 1; gbc.gridy = 0;
+		statusPanel.add(targetsLeftLbl,gbc);
+		gbc.gridx = 0; gbc.gridy = 0;
+		add(statusPanel, gbc);
+	}
+/*	private void createBoard(){
+		char[][] level = gameEngine.getLevel();
+		graphicBoard = new JLabel[level.length][level[0].length];
+		for (int y = 0; y < level.length; y++) {
+			for (int x = 0; x < level[y].length; x++) {
+				graphicBoard[y][x] = new JLabel(getIcon(level[y][x]));
+				gbc.gridx = x; gbc.gridy = y;
+				gamePanel.add(graphicBoard[y][x], gbc);
+			}
+		}
+	}
+	*/
+	private Icon getIcon(char symbol) {
+		switch(symbol){
+		case ' ':
+			return blankImg;
+		case '#':
+			return wallImg;
+		case '.':
+			return targetImg;
+		case '@':
+			return moverImg;
+		case '+':
+			return moverOnTargetImg;
+		case '$':
+			return movableImg;
+		case '*':
+			return movableOnTargetImg;
+		}
+		return null;
+	}
+
+	public void updateBoard() {
+		gamePanel.removeAll();
+		char[][] level = gameEngine.getLevel();
+		graphicBoard = new JLabel[level.length][level[0].length];
+		for (int y = 0; y < level.length; y++) {
+			for (int x = 0; x < level[y].length; x++) {
+				//graphicBoard[y][x].setIcon(getIcon(level[y][x]));
+				gbc.gridx = x; gbc.gridy = y;
+				gamePanel.add(new JLabel(getIcon(level[y][x])),gbc);
+			}
+		}
+	}
+
+	private void updateStatus() {
+		movesLbl.setText("Moves: "+gameEngine.getMoves());
+		targetsLeftLbl.setText("Targets left: "+gameEngine.targetsLeft());
+		movesHistoryView.updateMovesLbl(gameEngine.getMovesString(true));
+		movesHistoryView.pack();
+	}	
+	@SuppressWarnings("unused")
+	private void sysoutLevel(char[][] level) {
+		for (int y = 0; y < level.length; y++) {
+			for (int x = 0; x < level[y].length; x++) {
+				System.out.print(level[y][x]);
+			}
+			System.out.println();
+		}
+	}
+
+	private void hasWon() {
+		if(gameEngine.hasWon())  JOptionPane.showMessageDialog(this, "You made it with " + gameEngine.getMoves() +" moves\n Moves: "+gameEngine.getMovesString(false));	
+	}
+	@Override
+	public void keyReleased(KeyEvent e) {
+		if(!gameEngine.hasWon()){
+			     if(e.getKeyCode() == 37) gameEngine.move(Direction.LEFT); 
+			else if(e.getKeyCode() == 38) gameEngine.move(Direction.UP);
+			else if(e.getKeyCode() == 39) gameEngine.move(Direction.RIGHT);
+			else if(e.getKeyCode() == 40) gameEngine.move(Direction.DOWN);
+			else if(e.getKeyCode() == 8)  gameEngine.undo();
+			updateBoard();
+			updateStatus();
+			hasWon();
+			System.out.println(gameEngine.getMovesString(false));
+		}
+		
+	}
+	
+
+	@Override
+	public void keyPressed(KeyEvent e) { }
+
+	@Override
+	public void keyTyped(KeyEvent e) { }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		for (int i = 0; i < lvlMenuItems.length; i++) {
+			if(e.getSource() == lvlMenuItems[i]) {gameEngine.newLevel("/Sokoban/lvl0"+i+".txt");updateBoard();updateStatus();}
+			frame.pack();
+		}
+		
+	}
+	
+
+}
